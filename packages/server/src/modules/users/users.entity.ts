@@ -1,12 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { IsNotEmpty } from "class-validator";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from "typeorm";
+import { IUser } from 'common';
+import { Account } from "../accounts/accounts.entity";
+import { UserProfile } from "../user-profiles/user-profiles.entity";
 
 @Entity()
-export class User {
+export class User implements IUser {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @IsNotEmpty()
-  foo: string;
+  @OneToOne(type => Account)
+  account: Account;
+
+  @OneToOne(type => UserProfile, profile => profile.user)
+  profile: UserProfile;
 }

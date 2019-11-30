@@ -1,12 +1,14 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { IsNotEmpty } from "class-validator";
+import { IAccount } from "common";
 
 @Entity()
-export class Account {
+export class Account implements IAccount {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  @IsNotEmpty()
-  foo: string;
+  name: string;
+
+  @Column()
+  password: string;
 }

@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccountsModule } from '../accounts/accounts.module';
 import { UsersModule } from '../users/users.module';
 import { UserProfilesModule } from '../user-profiles/user-profiles.module';
+import { BCryptService } from 'src/utils/bcrypt.service';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { UserProfilesModule } from '../user-profiles/user-profiles.module';
     UsersModule,
     UserProfilesModule
   ],
-  providers: [AuthService],
+  providers: [AuthService, BCryptService],
   controllers: [AuthController],
   exports: [AuthService, TypeOrmModule],
 })
