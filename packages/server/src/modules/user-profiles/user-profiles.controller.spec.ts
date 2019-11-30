@@ -8,7 +8,7 @@ describe('UserProfiles Controller', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [DatabaseModule, UserProfilesModule],
+      imports: [DatabaseModule, UserProfilesModule],
     }).compile();
 
     controller = module.get<UserProfilesController>(UserProfilesController);

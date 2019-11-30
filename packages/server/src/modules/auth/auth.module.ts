@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { AccountsModule } from '../accounts/accounts.module';
 import { UsersModule } from '../users/users.module';
@@ -19,6 +18,6 @@ import { BCryptService } from 'src/utils/bcrypt.service';
   ],
   providers: [AuthService, BCryptService],
   controllers: [AuthController],
-  exports: [AuthService, TypeOrmModule],
+  exports: [AuthService],
 })
 export class AuthModule {}
