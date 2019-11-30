@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./dist",
+    "module": "es2015",
+    "noImplicitAny": false,
+    "outDir": "./dist",
+    "target": "es5",
+    "lib": ["es7", "dom"],
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "lib/lib.es5.d.ts"],
+  "exclude": ["node_modules"]
+}
