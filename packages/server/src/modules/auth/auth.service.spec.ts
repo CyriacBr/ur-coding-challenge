@@ -11,7 +11,6 @@ import { UsersService } from '../users/users.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let accountService: AccountsService;
   let userService: UsersService;
 
   beforeEach(async () => {
@@ -20,7 +19,6 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    accountService = module.get<AccountsService>(AccountsService);
     userService = module.get<UsersService>(UsersService);
   });
 
@@ -46,12 +44,13 @@ describe('AuthService', () => {
         firstName: 'User',
         lastName: '1',
         password: '1234',
-        latitude: 0,
-        longitude: 0,
+        latitude: 500,
+        longitude: 300,
       });
       user = await userService.findByEmail('user1@gmail.com');
       expect(user.account).toBeDefined();
       expect(user.profile).toBeDefined();
+      expect(user.location).toBeDefined();
     });
 
     it('should return a token', async () => {
@@ -75,8 +74,16 @@ describe('AuthService', () => {
         email: 'user1@gmail.com',
         firstName: 'User',
         lastName: '1',
-        latitude: 0,
-        longitude: 0,
+      });
+    });
+
+    it('a location should be created', async () => {
+      const { location } = user;
+      const { id, ...data} = location;
+      expect(location).toBeDefined();
+      expect(data).toEqual({
+        latitude: 500,
+        longitude: 300
       });
     });
 
