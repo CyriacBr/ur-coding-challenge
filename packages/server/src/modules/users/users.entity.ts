@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "ty
 import { IUser } from 'common';
 import { Account } from "../accounts/accounts.entity";
 import { UserProfile } from "../user-profiles/user-profiles.entity";
+import { Location } from "../locations/locations.entity";
 
 @Entity()
 export class User implements IUser {
@@ -15,4 +16,8 @@ export class User implements IUser {
   @OneToOne(type => UserProfile, profile => profile.user)
   @JoinColumn()
   profile: UserProfile;
+
+  @OneToOne(type => Location)
+  @JoinColumn()
+  location: Location;
 }

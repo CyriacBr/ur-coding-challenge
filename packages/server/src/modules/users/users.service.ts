@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from './users.entity';
 import { Account } from '../accounts/accounts.entity';
 import { UserProfile } from '../user-profiles/user-profiles.entity';
+import { Location } from '../locations/locations.entity';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,8 @@ export class UsersService {
     private readonly accountRepository: Repository<Account>,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
   findAll() {
@@ -22,7 +25,7 @@ export class UsersService {
 
   findById(id: number) {
     return this.repository.findOne(id, {
-      relations: ['account', 'profile'],
+      relations: ['account', 'profile', 'location'],
     });
   }
 
@@ -35,7 +38,7 @@ export class UsersService {
         account: { id: account.id },
       },
       {
-        relations: ['account', 'profile'],
+        relations: ['account', 'profile', 'location'],
       },
     );
   }
@@ -77,6 +80,7 @@ export class UsersService {
     const result = await this.repository.delete(id);
     await this.profileRepository.delete(user.profile.id);
     await this.accountRepository.delete(user.account.id);
+    await this.locationRepository.delete(user.location.id);
     return result;
   }
 
