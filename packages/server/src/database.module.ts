@@ -12,6 +12,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'ur_code_challenge_cyriac',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
+      keepConnectionAlive: true,
+      logging: true
     }),
   ],
 })

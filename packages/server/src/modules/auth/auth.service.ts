@@ -18,29 +18,26 @@ export class AuthService {
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
     private readonly bcryptService: BCryptService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   async signIn(dto: AuthDTO.SignIn) {
-    const user = await this.userRepository.findOne(
-      {
-        account: { name: dto.email },
-      },
-      {
-        relations: ['account', 'profile'],
-      },
-    );
-    if (!user) {
+    const account = await this.accountRepository.findOne({ name: dto.email });
+    if (!account) {
       return null;
     }
+    const user = await this.userRepository.findOne({
+      where: { account: { id: account.id } },
+      relations: ['profile'],
+    });
     const match = await this.bcryptService.compare(
       dto.password,
-      user.account.password,
+      account.password,
     );
     if (match) {
       return this.makeToken({
         userId: user.id,
-        profile: user.profile
+        profile: user.profile,
       });
     }
     return null;
@@ -58,6 +55,7 @@ export class AuthService {
     account.name = dto.email;
     account.password = password;
     await this.accountRepository.save(account);
+    console.log('------ACCOUNT SAVED');
     const profile = new UserProfile();
     profile.email = dto.email;
     profile.firstName = dto.firstName;
@@ -65,13 +63,15 @@ export class AuthService {
     profile.latitude = dto.latitude;
     profile.longitude = dto.longitude;
     await this.profileRepository.save(profile);
+    console.log('-----PROFILE SAVED');
     let user = new User();
     user.account = account;
     user.profile = profile;
     user = await this.userRepository.save(user);
+    console.log('--------USER SAVED');
     return this.makeToken({
       userId: user.id,
-      profile
+      profile,
     });
   }
 

@@ -13,5 +13,6 @@ export class User implements IUser {
   account: Account;
 
   @OneToOne(type => UserProfile, profile => profile.user)
+  @JoinColumn()
   profile: UserProfile;
 }
