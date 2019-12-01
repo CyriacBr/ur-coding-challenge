@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn } from "typeorm";
 import { IShop } from "common";
 import { Location } from "../locations/locations.entity";
 import { User } from "../users/users.entity";
@@ -12,8 +12,6 @@ export class Shop implements IShop {
   name: string;
 
   @OneToOne(type => Location)
+  @JoinColumn()
   location: Location;
-
-  @ManyToOne(type => User, user => user.likedShops)
-  user: User;
 }
