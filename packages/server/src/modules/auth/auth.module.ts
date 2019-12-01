@@ -6,6 +6,7 @@ import { AccountsModule } from '../accounts/accounts.module';
 import { UsersModule } from '../users/users.module';
 import { UserProfilesModule } from '../user-profiles/user-profiles.module';
 import { BCryptService } from 'src/utils/bcrypt.service';
+import { LocationsModule } from '../locations/locations.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { BCryptService } from 'src/utils/bcrypt.service';
     }),
     AccountsModule,
     UsersModule,
-    UserProfilesModule
+    UserProfilesModule,
+    LocationsModule
   ],
   providers: [AuthService, BCryptService],
   controllers: [AuthController],

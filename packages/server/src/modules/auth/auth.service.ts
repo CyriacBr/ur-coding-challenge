@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { BCryptService } from 'src/utils/bcrypt.service';
 import { User } from '../users/users.entity';
 import { UserProfile } from '../user-profiles/user-profiles.entity';
+import { Location } from '../locations/locations.entity';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
     private readonly bcryptService: BCryptService,
     private readonly jwtService: JwtService,
   ) {}
@@ -55,20 +58,20 @@ export class AuthService {
     account.name = dto.email;
     account.password = password;
     await this.accountRepository.save(account);
-    console.log('------ACCOUNT SAVED');
     const profile = new UserProfile();
     profile.email = dto.email;
     profile.firstName = dto.firstName;
     profile.lastName = dto.lastName;
-    profile.latitude = dto.latitude;
-    profile.longitude = dto.longitude;
     await this.profileRepository.save(profile);
-    console.log('-----PROFILE SAVED');
+    const location = new Location();
+    location.latitude = dto.latitude;
+    location.longitude = dto.longitude;
+    await this.locationRepository.save(location);
     let user = new User();
     user.account = account;
     user.profile = profile;
+    user.location = location;
     user = await this.userRepository.save(user);
-    console.log('--------USER SAVED');
     return this.makeToken({
       userId: user.id,
       profile,
