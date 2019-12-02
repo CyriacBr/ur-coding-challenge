@@ -25,7 +25,7 @@ export class UsersService {
 
   findById(id: number) {
     return this.repository.findOne(id, {
-      relations: ['account', 'profile', 'location'],
+      relations: ['account', 'profile', 'location', 'likedShops'],
     });
   }
 
@@ -38,7 +38,7 @@ export class UsersService {
         account: { id: account.id },
       },
       {
-        relations: ['account', 'profile', 'location'],
+        relations: ['account', 'profile', 'location', 'likedShops'],
       },
     );
   }

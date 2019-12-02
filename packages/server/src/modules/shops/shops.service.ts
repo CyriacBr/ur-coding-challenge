@@ -1,21 +1,55 @@
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, UpdateResult } from "typeorm";
-import { Injectable } from "@nestjs/common";
-import { Shop } from "./shops.entity";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Shop } from './shops.entity';
+import { UsersService } from '../users/users.service';
+import { ShopDislikesService } from '../shop-dislikes/shop-dislikes.service';
+import { locationDistance } from 'common';
+import { Location } from '../locations/locations.entity';
 
 @Injectable()
 export class ShopsService {
   constructor(
     @InjectRepository(Shop)
-    private readonly repository: Repository<Shop>
+    private readonly repository: Repository<Shop>,
+    private readonly userService: UsersService,
+    @Inject(forwardRef(() => ShopDislikesService))
+    private readonly shopDislikeService: ShopDislikesService,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
   findAll() {
-    return this.repository.find();
+    return this.repository.find({
+      relations: ['location'],
+    });
   }
 
   findById(id: number) {
-    return this.repository.findOne(id);
+    return this.repository.findOne(id, {
+      relations: ['location'],
+    });
+  }
+
+  async findNearbyShops(userId: number) {
+    const user = await this.userService.findById(userId);
+    let shops = await this.findAll();
+    shops = await this.shopDislikeService.applyDislikes(userId, shops);
+    return shops.sort((a, b) => {
+      const aDistance = locationDistance(
+        user.location.latitude,
+        user.location.longitude,
+        a.location.latitude,
+        a.location.longitude,
+      );
+      const bDistance = locationDistance(
+        user.location.latitude,
+        user.location.longitude,
+        b.location.latitude,
+        b.location.longitude,
+      );
+      return aDistance - bDistance;
+    });
   }
 
   create(data: Shop) {
@@ -50,8 +84,11 @@ export class ShopsService {
     }
   }
 
-  delete(id: number) {
-    return this.repository.delete(id);
+  async delete(id: number) {
+    const shop = await this.findById(id);
+    const result = await this.repository.delete(id);
+    await this.locationRepository.delete(shop.location.id);
+    return result;
   }
 
   deleteBulk(idList: string) {
