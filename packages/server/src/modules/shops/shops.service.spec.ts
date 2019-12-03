@@ -99,27 +99,53 @@ describe('ShopsService', () => {
     });
 
     afterAll(async () => {
-      await userService.delete(user.id);
-      for (const shop of shops) {
-        await service.delete(shop.id);
+      jest.spyOn(userService, 'delete').mockImplementation(function(id: number) {
+        return this.repository.delete(id);
+      });
+      try {
+        await userService.delete(user.id);
+        for (const shop of shops) {
+          await service.delete(shop.id);
+        }
+      } catch (error) {
+        console.error(error);
       }
-    })
+    });
 
     it('should work by default', async () => {
-      const shops = await service.findNearbyShops(user.id);
-      expect(shops).toEqual(orderedShops);
+      const expectedShops = await service.findNearbyShops(user.id);
+      expect(expectedShops).toEqual(orderedShops);
     });
 
     it('should work with a dislike', async () => {
       const shopDislikeId = shops[1].id;
 
       await dislikeService.add(user.id, shopDislikeId);
-      let _shops = await service.findNearbyShops(user.id);
-      expect(_shops).toEqual(orderedShops.filter(v => v.id !== shopDislikeId));
+      let expectedShops = await service.findNearbyShops(user.id);
+      expect(expectedShops).toEqual(orderedShops.filter(v => v.id !== shopDislikeId));
 
       await dislikeService.remove(user.id, shopDislikeId);
-      _shops = await service.findNearbyShops(user.id);
-      expect(_shops).toEqual(orderedShops);
+      expectedShops = await service.findNearbyShops(user.id);
+      expect(expectedShops).toEqual(orderedShops);
+    });
+
+    it('should work with an expired dislike', async () => {
+      const shopDislikeId = shops[1].id;
+      const date = new Date();
+      date.setHours(date.getHours() - 3);
+      const shop = await service.findById(shopDislikeId);
+      const dislike = await dislikeService.create({
+        id: undefined,
+        date,
+        shop,
+        user,
+      });
+
+      const expectedShops = await service.findNearbyShops(user.id);
+      expect(expectedShops).toEqual(orderedShops);
+
+      await dislikeService.delete(dislike.id);
+      console.log('--Dislike removed');
     });
   });
 });

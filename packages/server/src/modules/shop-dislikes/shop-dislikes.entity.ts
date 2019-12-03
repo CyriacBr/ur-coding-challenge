@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne } from "typeorm";
 import { IShopDislike } from "common";
 import { User } from "../users/users.entity";
 import { Shop } from "../shops/shops.entity";
@@ -11,11 +11,9 @@ export class ShopDislike implements IShopDislike {
   @Column()
   date: Date;
 
-  @OneToOne(type => User)
-  @JoinColumn()
+  @ManyToOne(type => User)
   user: User;
 
-  @OneToOne(type => Shop)
-  @JoinColumn()
+  @ManyToOne(type => Shop)
   shop: Shop;
 }
