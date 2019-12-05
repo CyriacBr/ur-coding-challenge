@@ -19,17 +19,6 @@ export class ShopsService {
     private readonly locationRepository: Repository<Location>,
   ) {}
 
-  findAll() {
-    return this.repository.find({
-      relations: ['location'],
-    });
-  }
-
-  findById(id: number) {
-    return this.repository.findOne(id, {
-      relations: ['location'],
-    });
-  }
 
   async findNearbyShops(userId: number) {
     const user = await this.userService.findById(userId);
@@ -49,6 +38,30 @@ export class ShopsService {
         b.location.longitude,
       );
       return aDistance - bDistance;
+    });
+  }
+
+  async likeShop(userId: number, shopId: number) {
+    const user = await this.userService.findById(userId);
+    const shop = await this.findById(shopId);
+    user.likedShops.push(shop);
+    await this.userService.update(userId, user);
+  }
+
+  async findLikedShops(userId: number) {
+    const user = await this.userService.findById(userId);
+    return user.likedShops;
+  }
+
+  findAll() {
+    return this.repository.find({
+      relations: ['location'],
+    });
+  }
+
+  findById(id: number) {
+    return this.repository.findOne(id, {
+      relations: ['location'],
     });
   }
 
