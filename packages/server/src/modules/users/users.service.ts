@@ -1,13 +1,22 @@
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, UpdateResult } from "typeorm";
-import { Injectable } from "@nestjs/common";
-import { User } from "./users.entity";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { User } from './users.entity';
+import { Account } from '../accounts/accounts.entity';
+import { UserProfile } from '../user-profiles/user-profiles.entity';
+import { Location } from '../locations/locations.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly repository: Repository<User>
+    private readonly repository: Repository<User>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+    @InjectRepository(UserProfile)
+    private readonly profileRepository: Repository<UserProfile>,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
   findAll() {
@@ -15,7 +24,23 @@ export class UsersService {
   }
 
   findById(id: number) {
-    return this.repository.findOne(id);
+    return this.repository.findOne(id, {
+      relations: ['account', 'profile', 'location', 'likedShops'],
+    });
+  }
+
+  async findByEmail(email: string) {
+    const account = await this.accountRepository.findOneOrFail({
+      name: email,
+    });
+    return this.repository.findOneOrFail(
+      {
+        account: { id: account.id },
+      },
+      {
+        relations: ['account', 'profile', 'location', 'likedShops'],
+      },
+    );
   }
 
   create(data: User) {
@@ -50,8 +75,13 @@ export class UsersService {
     }
   }
 
-  delete(id: number) {
-    return this.repository.delete(id);
+  async delete(id: number) {
+    const user = await this.findById(id);
+    const result = await this.repository.delete(id);
+    await this.profileRepository.delete(user.profile.id);
+    await this.accountRepository.delete(user.account.id);
+    await this.locationRepository.delete(user.location.id);
+    return result;
   }
 
   deleteBulk(idList: string) {

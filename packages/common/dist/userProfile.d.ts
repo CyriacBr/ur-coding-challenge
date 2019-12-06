@@ -3,6 +3,4 @@ export interface IUserProfile {
     email: string;
     firstName: string;
     lastName: string;
-    latitude: number;
-    longitude: number;
 }

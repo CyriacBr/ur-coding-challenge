@@ -18,10 +18,4 @@ export class UserProfile implements IUserProfile {
 
   @Column()
   lastName: string;
-
-  @Column()
-  latitude: number;
-
-  @Column()
-  longitude: number;
 }

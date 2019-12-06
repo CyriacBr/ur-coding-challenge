@@ -18,6 +18,12 @@ export class AccountsService {
     return this.repository.findOne(id);
   }
 
+  findByName(name: string) {
+    return this.repository.findOneOrFail({
+      name
+    });
+  }
+
   create(data: Account) {
     return this.repository.save(data);
   }

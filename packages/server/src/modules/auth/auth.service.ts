@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { BCryptService } from 'src/utils/bcrypt.service';
 import { User } from '../users/users.entity';
 import { UserProfile } from '../user-profiles/user-profiles.entity';
+import { Location } from '../locations/locations.entity';
 
 @Injectable()
 export class AuthService {
@@ -17,30 +18,29 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
     private readonly bcryptService: BCryptService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   async signIn(dto: AuthDTO.SignIn) {
-    const user = await this.userRepository.findOne(
-      {
-        account: { name: dto.email },
-      },
-      {
-        relations: ['account', 'profile'],
-      },
-    );
-    if (!user) {
+    const account = await this.accountRepository.findOne({ name: dto.email });
+    if (!account) {
       return null;
     }
+    const user = await this.userRepository.findOne({
+      where: { account: { id: account.id } },
+      relations: ['profile'],
+    });
     const match = await this.bcryptService.compare(
       dto.password,
-      user.account.password,
+      account.password,
     );
     if (match) {
       return this.makeToken({
         userId: user.id,
-        profile: user.profile
+        profile: user.profile,
       });
     }
     return null;
@@ -62,16 +62,19 @@ export class AuthService {
     profile.email = dto.email;
     profile.firstName = dto.firstName;
     profile.lastName = dto.lastName;
-    profile.latitude = dto.latitude;
-    profile.longitude = dto.longitude;
     await this.profileRepository.save(profile);
+    const location = new Location();
+    location.latitude = dto.latitude;
+    location.longitude = dto.longitude;
+    await this.locationRepository.save(location);
     let user = new User();
     user.account = account;
     user.profile = profile;
+    user.location = location;
     user = await this.userRepository.save(user);
     return this.makeToken({
       userId: user.id,
-      profile
+      profile,
     });
   }
 
