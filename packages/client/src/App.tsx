@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { AppBar } from "./shared/components/appBar";
 import { StoreProvider } from "easy-peasy";
-import { store } from "./store";
+import { store, useStoreActions } from "./store";
 import {
   Switch,
   BrowserRouter as Router,
@@ -14,6 +14,7 @@ import { LoginPage } from "./pages/login/loginPage";
 import { NearbyShopsPage } from "./pages/nearby-shops/nearbyShopsPage";
 import { PreferredShopsPage } from "./pages/preferred-shops/preferredShopsPage";
 import { RegisterPage } from "./pages/register/registerPage";
+import { useFetcher, Fetcher } from "react-fetcher-hooks";
 
 const s = {
   Container: styled.div`
@@ -31,9 +32,16 @@ const s = {
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
+  const actions = useStoreActions(actions => actions.auth);
+  const fetcher = useFetcher();
+  actions.setFetcher(fetcher);
+
+  useEffect(() => {
+    actions.loadAuthState();
+  }, []);
   return (
-    <StoreProvider store={store}>
-      <s.Container>
+    <s.Container>
+      <Fetcher refs={fetcher} Fallback={() => <div></div>}>
         <Router>
           <AppBar />
           <s.Page>
@@ -50,8 +58,8 @@ const App: React.FC<AppProps> = () => {
             </Switch>
           </s.Page>
         </Router>
-      </s.Container>
-    </StoreProvider>
+      </Fetcher>
+    </s.Container>
   );
 };
 
