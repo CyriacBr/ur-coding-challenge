@@ -45,6 +45,7 @@ export const authStoreModel: AuthStoreModel = {
       });
     } else {
       actions.setUserData(null);
+      fetcher.setLoading(false);
     }
   }),
   setUserData: action((state, data) => {
