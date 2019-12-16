@@ -21,6 +21,7 @@ import algoliasearch from "algoliasearch";
 import { useDebouncedCallback } from "use-debounce";
 import { ItemDataType } from "rsuite/lib/@types/common";
 import { AuthDTO } from "common";
+import { LocationInput } from "../../shared/components/locationInput";
 
 interface RegisterFormProps {
   onSubmit: (data: AuthDTO.SignUp) => void;
@@ -46,13 +47,7 @@ interface PlaceSuggestion {
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
   const [step, setStep] = useState(0);
-  const place = useRef<algoliasearch.Places.PlaceInterface>();
-  const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>(
-    []
-  );
-  const [placeLoading, setPlaceLoading] = useState(false);
   const [placeValue, setPlaceValue] = useState<PlaceSuggestion>();
-  const [placeLabel, setPlaceLabel] = useState("");
   const { register, handleSubmit, errors, setValue: setFormValue } = useForm<
     Form
   >();
@@ -60,76 +55,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
 
   useEffect(() => {
     register("location", { required: true, name: "location" });
-    /**
-     * We're using Algolia Places API to geo-reverse and search
-     * location in order to setup user's profile.
-     * https://community.algolia.com/places
-     */
-    place.current = algoliasearch.initPlaces(
-      "plYZPQ85CQKF",
-      "e79835bdbafdefb2cfdef90c64903762"
-    );
   }, []);
 
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(async res => {
-      setPlaceLoading(true);
-      const results = await place.current.reverse({
-        aroundLatLng: `${res.coords.latitude},${res.coords.longitude}`
-      });
-      setPlaceLoading(false);
-      if (results && results.hits.length > 0) {
-        const value = results.hits[0];
-        const sugg: PlaceSuggestion = {
-          country: value.country.default,
-          city: value.administrative[0],
-          label: `${value.country.default}, ${value.administrative[0]}`,
-          geo: {
-            latitude: value._geoloc.lat,
-            longitude: value._geoloc.lng
-          }
-        };
-        setPlaceValue(sugg);
-        setPlaceLabel(sugg.label);
-        setFormValue("location", sugg.label);
-      }
-    });
-  };
-
-  const [onPlaceInputChange] = useDebouncedCallback(async (value: string) => {
-    if (!value) return;
-    setPlaceLoading(true);
-    const results = await place.current.search({
-      query: value,
-      type: "city",
-      hitsPerPage: 2
-    });
-    setPlaceLoading(false);
-    setPlaceSuggestions(
-      results.hits.map(v => ({
-        country: v.country.default,
-        city: v.administrative[0],
-        label: `${v.country.default}, ${v.administrative[0]}`,
-        geo: {
-          latitude: v._geoloc.lat,
-          longitude: v._geoloc.lng
-        }
-      }))
-    );
-  }, 500);
-
-  const onPlaceLabelChange = (value: string) => {
-    setPlaceLabel(value);
-    onPlaceInputChange(value);
-  };
-
-  const onPlaceSelect = (data: ItemDataType) => {
-    setPlaceValue(data as any);
-    setImmediate(() => {
-      setPlaceLabel(data.label);
-      setFormValue("location", data.label);
-    });
+  const onPlaceChanged = (data: PlaceSuggestion) => {
+    setFormValue("location", data.label);
+    setPlaceValue(data);
   };
 
   const onProfilSubmit = (data: Form) => {
@@ -179,22 +109,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit }) => {
         </FormGroup>
         <FormGroup>
           <ControlLabel>Location</ControlLabel>
-          <InputGroup>
-            <InputGroup.Button onClick={getCurrentLocation}>
-              <Icon icon="map-marker" />
-            </InputGroup.Button>
-            <AutoComplete
-              data={placeSuggestions}
-              onChange={onPlaceLabelChange}
-              onSelect={onPlaceSelect}
-              value={placeLabel}
-            />
-            {placeLoading && (
-              <InputGroup.Addon>
-                <Loader />
-              </InputGroup.Addon>
-            )}
-          </InputGroup>
+          <LocationInput onPlaceChanged={onPlaceChanged} />
           {errors.location && (
             <HelpBlock style={{ color: "red" }}>Required</HelpBlock>
           )}
