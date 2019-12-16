@@ -34,7 +34,7 @@ export class AuthService {
     }
     const user = await this.userRepository.findOne({
       where: { account: { id: account.id } },
-      relations: ['profile'],
+      relations: ['profile', 'location'],
     });
     const match = await this.bcryptService.compare(
       dto.password,
@@ -43,6 +43,7 @@ export class AuthService {
     if (match) {
       return this.makeToken({
         userId: user.id,
+        location: user.location,
         profile: user.profile,
       });
     }
@@ -83,6 +84,7 @@ export class AuthService {
     user = await this.userRepository.save(user);
     return this.makeToken({
       userId: user.id,
+      location,
       profile,
     });
   }

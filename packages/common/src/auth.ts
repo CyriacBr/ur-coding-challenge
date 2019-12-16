@@ -1,5 +1,6 @@
 import { IUserProfile } from ".";
 import { ServerError } from "./base";
+import { ILocation } from "./location";
 
 export namespace AuthDTO {
   export interface SignUp {
@@ -18,6 +19,7 @@ export namespace AuthDTO {
   export interface Payload {
     userId: number;
     profile: IUserProfile;
+    location: ILocation;
   }
   export interface Me {
     token: string;
