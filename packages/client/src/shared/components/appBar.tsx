@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Dropdown, Avatar, Icon, Button } from "rsuite";
 import { useStoreState } from "../../store";
+import { Link } from 'react-router-dom';
 
 const s = {
   Container: styled.div`
@@ -33,7 +34,9 @@ const AppBar: React.FC<AppBarProps> = () => {
     return isLoggedIn ? (
       renderAvatar()
     ) : (
-      <Button appearance="primary">Register</Button>
+      <Button appearance="primary">
+        <Link to='/register'>Register</Link>
+      </Button>
     );
   };
 

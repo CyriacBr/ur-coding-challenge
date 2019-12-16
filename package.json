@@ -1,4 +1,7 @@
 {
   "private": true,
-  "workspaces": ["packages/client", "packages/server", "packages/common"]
+  "workspaces": ["packages/client", "packages/server", "packages/common"],
+  "scripts": {
+    "postinstall": "rm -rf node_modules/@types/react-native"
+  }
 }

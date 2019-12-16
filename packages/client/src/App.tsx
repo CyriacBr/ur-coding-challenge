@@ -3,7 +3,12 @@ import styled from "styled-components";
 import { AppBar } from "./shared/components/appBar";
 import { StoreProvider } from "easy-peasy";
 import { store } from "./store";
-import { Switch, BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import {
+  Switch,
+  BrowserRouter as Router,
+  Route,
+  Redirect
+} from "react-router-dom";
 import { PrivateRoute } from "./shared/components/privateRoute";
 import { LoginPage } from "./pages/login/loginPage";
 import { NearbyShopsPage } from "./pages/nearby-shops/nearbyShopsPage";
@@ -13,6 +18,7 @@ import { RegisterPage } from "./pages/register/registerPage";
 const s = {
   Container: styled.div`
     width: 100vw;
+    height: 100%;
     display: flex;
     flex-direction: column;
   `,
@@ -28,9 +34,9 @@ const App: React.FC<AppProps> = () => {
   return (
     <StoreProvider store={store}>
       <s.Container>
-        <AppBar />
-        <s.Page>
-          <Router>
+        <Router>
+          <AppBar />
+          <s.Page>
             <Switch>
               <Route exact path="/login" component={LoginPage} />
               <Route exact path="/register" component={RegisterPage} />
@@ -42,8 +48,8 @@ const App: React.FC<AppProps> = () => {
               />
               <Redirect to="/nearby" />
             </Switch>
-          </Router>
-        </s.Page>
+          </s.Page>
+        </Router>
       </s.Container>
     </StoreProvider>
   );
