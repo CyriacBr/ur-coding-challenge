@@ -15,6 +15,7 @@ import { Location } from "./locations.entity";
 import { Request } from "express";
 import { AuthGuard } from "../jwt/auth.guard";
 
+@UseGuards(AuthGuard)
 @Controller("locations")
 export class LocationsController {
   constructor(private readonly service: LocationsService) {}
@@ -45,7 +46,6 @@ export class LocationsController {
     return this.service.update(Number(id), data);
   }
 
-  @UseGuards(AuthGuard)
   @Patch()
   updateFromUser(@Req() req: Request, @Body() data: Location) {
     //@ts-ignore

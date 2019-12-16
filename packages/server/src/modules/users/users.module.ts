@@ -6,9 +6,10 @@ import { User } from "./users.entity";
 import { AccountsModule } from "../accounts/accounts.module";
 import { UserProfilesModule } from "../user-profiles/user-profiles.module";
 import { LocationsModule } from "../locations/locations.module";
+import { JWTModule } from "../jwt/jwt.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), AccountsModule, forwardRef(() => UserProfilesModule), LocationsModule],
+  imports: [TypeOrmModule.forFeature([User]), AccountsModule, forwardRef(() => UserProfilesModule), LocationsModule, JWTModule],
   providers: [UsersService],
   controllers: [UsersController],
   exports: [UsersService, TypeOrmModule]

@@ -15,6 +15,7 @@ import { UserProfile } from "./user-profiles.entity";
 import { AuthGuard } from "../jwt/auth.guard";
 import { Request } from "express";
 
+@UseGuards(AuthGuard)
 @Controller("user-profiles")
 export class UserProfilesController {
   constructor(private readonly service: UserProfilesService) {}
@@ -45,7 +46,6 @@ export class UserProfilesController {
     return this.service.update(Number(id), data);
   }
 
-  @UseGuards(AuthGuard)
   @Patch()
   updateFromUser(@Req() req: Request, @Body() data: UserProfile) {
     //@ts-ignore
