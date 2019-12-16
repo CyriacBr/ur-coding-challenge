@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import { PrivateRoute } from "./shared/components/privateRoute";
 import { LoginPage } from "./pages/login/loginPage";
-import { NearbyShopsPage } from "./pages/nearby-shops/nearbyShopsPage";
+import { NearbyShopsPage } from "./pages/shops/shopsPage";
 import { PreferredShopsPage } from "./pages/preferred-shops/preferredShopsPage";
 import { RegisterPage } from "./pages/register/registerPage";
 import { useFetcher, Fetcher } from "react-fetcher-hooks";
@@ -52,13 +52,13 @@ const App: React.FC<AppProps> = () => {
             <Switch>
               <Route exact path="/login" component={LoginPage} />
               <Route exact path="/register" component={RegisterPage} />
-              <PrivateRoute exact path="/nearby" component={NearbyShopsPage} />
+              <PrivateRoute exact path="/shops" component={NearbyShopsPage} />
               <PrivateRoute
                 exact
                 path="/preferred"
                 component={PreferredShopsPage}
               />
-              <Redirect to="/nearby" />
+              <Redirect to="/shops" />
             </Switch>
           </s.Page>
         </Router>
