@@ -41,7 +41,11 @@ const App: React.FC<AppProps> = () => {
   }, []);
   return (
     <s.Container>
-      <Fetcher refs={fetcher} Fallback={() => <div></div>}>
+      <Fetcher
+        refs={fetcher}
+        Fallback={() => <div></div>}
+        options={{ initialLoading: true }}
+      >
         <Router>
           <AppBar />
           <s.Page>
