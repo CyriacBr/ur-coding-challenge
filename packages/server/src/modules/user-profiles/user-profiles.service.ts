@@ -2,12 +2,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, UpdateResult } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { UserProfile } from "./user-profiles.entity";
+import { User } from "../users/users.entity";
 
 @Injectable()
 export class UserProfilesService {
   constructor(
     @InjectRepository(UserProfile)
-    private readonly repository: Repository<UserProfile>
+    private readonly repository: Repository<UserProfile>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
   findAll() {
@@ -36,6 +39,13 @@ export class UserProfilesService {
 
   update(id: number, data: UserProfile) {
     return this.repository.update(id, data);
+  }
+
+  async updateFromUser(userId: number, data: UserProfile) {
+    const user = await this.userRepository.findOneOrFail(userId, {
+      relations: ['profile']
+    });
+    return this.repository.update(user.profile.id, data);
   }
 
   updateBulk(data: UserProfile[]) {

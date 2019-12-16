@@ -6,10 +6,14 @@ import {
   Post,
   Put,
   Patch,
-  Delete
+  Delete,
+  UseGuards,
+  Req
 } from "@nestjs/common";
 import { UserProfilesService } from "./user-profiles.service";
 import { UserProfile } from "./user-profiles.entity";
+import { AuthGuard } from "../jwt/auth.guard";
+import { Request } from "express";
 
 @Controller("user-profiles")
 export class UserProfilesController {
@@ -39,6 +43,15 @@ export class UserProfilesController {
   @Patch(":id")
   update(@Param("id") id: string, @Body() data: UserProfile) {
     return this.service.update(Number(id), data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch()
+  updateFromUser(@Req() req: Request, @Body() data: UserProfile) {
+    //@ts-ignore
+    const userId = req.userId as number;
+    console.log('userId :', userId);
+    return this.service.updateFromUser(userId, data);
   }
 
   @Put("bulk")
