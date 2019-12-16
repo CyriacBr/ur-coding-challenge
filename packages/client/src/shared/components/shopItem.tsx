@@ -139,20 +139,14 @@ const ShopItem: React.FC<ShopItemProps> = ({ item, toggleLike, onDislike }) => {
                 onClick={() => toggleLike(item, isLiked())}
               />
             </Whisper>
-            <Whisper
-              placement="bottom"
-              trigger="hover"
-              speaker={<Tooltip>Dislike</Tooltip>}
+            <IconButton
+              className="thumbs-down"
+              icon={<Icon icon="thumbs-down" />}
+              size="md"
+              onClick={() => onDislike(item)}
             >
-              <IconButton
-                className="thumbs-down"
-                icon={<Icon icon="thumbs-down" />}
-                size="md"
-                onClick={() => onDislike(item)}
-              >
-                Dislike
-              </IconButton>
-            </Whisper>
+              Dislike
+            </IconButton>
           </ButtonToolbar>
         </s.Buttons>
       </s.Content>
