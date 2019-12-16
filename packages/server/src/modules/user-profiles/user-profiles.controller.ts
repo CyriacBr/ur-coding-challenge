@@ -50,7 +50,6 @@ export class UserProfilesController {
   updateFromUser(@Req() req: Request, @Body() data: UserProfile) {
     //@ts-ignore
     const userId = req.userId as number;
-    console.log('userId :', userId);
     return this.service.updateFromUser(userId, data);
   }
 
