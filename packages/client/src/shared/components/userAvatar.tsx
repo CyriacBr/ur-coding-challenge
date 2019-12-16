@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { useFetcher } from "react-fetcher-hooks";
-import { useStoreState } from "easy-peasy";
+import { useFetcher, Fetcher } from "react-fetcher-hooks";
 import { Dropdown, Icon, Avatar, Modal, Button } from "rsuite";
-import { useStoreActions } from "../../store";
+import { useStoreActions, useStoreState } from "../../store";
 import { PlaceSuggestion, LocationInput } from "./locationInput";
+import { IUserProfile, ILocation } from "common";
 
 const s = {};
 
@@ -14,6 +14,7 @@ const UserAvatar: React.FC<UserAvatarProps> = () => {
   const fetcher = useFetcher();
   const user = useStoreState(state => state.auth.userData);
   const actions = useStoreActions(actions => actions.auth);
+  const axios = useStoreState(state => state.axios);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [location, setLocation] = useState<PlaceSuggestion>();
 
@@ -26,7 +27,16 @@ const UserAvatar: React.FC<UserAvatarProps> = () => {
     setLocation(location);
   };
 
-  const validateNewLocation = () => {};
+  const validateNewLocation = () => {
+    const request = () =>
+      axios.patch("locations", {
+        latitude: location.geo.latitude,
+        longitude: location.geo.longitude
+      } as Partial<ILocation>);
+    fetcher.fetch(request, res => {
+      window.location.href = "/";
+    });
+  };
 
   const { profile } = user;
   const initials = `${profile.firstName[0]}${profile.lastName[0]}`;
@@ -64,24 +74,26 @@ const UserAvatar: React.FC<UserAvatarProps> = () => {
         show={showLocationModal}
         onHide={() => setShowLocationModal(false)}
       >
-        <Modal.Header>
-          <Modal.Title>Change Location</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Select a new location for your account
-          <LocationInput onPlaceChanged={onLocationChange} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={validateNewLocation} appearance="primary">
-            Validate and refresh page
-          </Button>
-          <Button
-            onClick={() => setShowLocationModal(false)}
-            appearance="subtle"
-          >
-            Cancel
-          </Button>
-        </Modal.Footer>
+        <Fetcher refs={fetcher}>
+          <Modal.Header>
+            <Modal.Title>Change Location</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Select a new location for your account
+            <LocationInput onPlaceChanged={onLocationChange} />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={validateNewLocation} appearance="primary">
+              Validate and refresh page
+            </Button>
+            <Button
+              onClick={() => setShowLocationModal(false)}
+              appearance="subtle"
+            >
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Fetcher>
       </Modal>
     </>
   );
