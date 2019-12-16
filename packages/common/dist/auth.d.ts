@@ -1,4 +1,5 @@
 import { IUserProfile } from ".";
+import { ServerError } from "./base";
 export declare namespace AuthDTO {
     interface SignUp {
         firstName: string;
@@ -19,4 +20,9 @@ export declare namespace AuthDTO {
     interface Me {
         token: string;
     }
+    type Error = ServerError & {
+        alreadyRegistered?: boolean;
+        accountNotFound?: boolean;
+        incorrectCredentials?: boolean;
+    };
 }
