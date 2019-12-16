@@ -27,7 +27,10 @@ export class AuthService {
   async signIn(dto: AuthDTO.SignIn) {
     const account = await this.accountRepository.findOne({ name: dto.email });
     if (!account) {
-      return null;
+      return {
+        hasError: true,
+        accountNotFound: true,
+      } as AuthDTO.Error;
     }
     const user = await this.userRepository.findOne({
       where: { account: { id: account.id } },
@@ -43,7 +46,10 @@ export class AuthService {
         profile: user.profile,
       });
     }
-    return null;
+    return {
+      hasError: true,
+      incorrectCredentials: true,
+    } as AuthDTO.Error;
   }
 
   async signUp(dto: AuthDTO.SignUp) {
@@ -51,7 +57,10 @@ export class AuthService {
       name: dto.email,
     });
     if (existingAccount) {
-      return null;
+      return {
+        hasError: true,
+        alreadyRegistered: true,
+      } as AuthDTO.Error;
     }
     const password = await this.bcryptService.crypt(dto.password);
     const account = new Account();

@@ -6,3 +6,4 @@ export * from './location';
 export * from './shop';
 export * from './shopDislike';
 export * from './utils'
+export * from './base';

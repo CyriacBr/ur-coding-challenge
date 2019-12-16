@@ -5,7 +5,7 @@ import { AuthModule } from './auth.module';
 import { AccountsService } from '../accounts/accounts.service';
 import { UserProfile } from '../user-profiles/user-profiles.entity';
 import { User } from '../users/users.entity';
-import { AuthDTO } from 'common';
+import { AuthDTO, hasServerError } from 'common';
 import { Account } from '../accounts/accounts.entity';
 import { UsersService } from '../users/users.service';
 
@@ -35,7 +35,7 @@ describe('AuthService', () => {
   });
 
   describe('signing up', () => {
-    let result: AuthDTO.Me;
+    let result: AuthDTO.Me | AuthDTO.Error;
     let user: User;
 
     beforeAll(async () => {
@@ -47,6 +47,7 @@ describe('AuthService', () => {
         latitude: 500,
         longitude: 300,
       });
+      expect(hasServerError<AuthDTO.Error>(result)).toBeFalsy();
       user = await userService.findByEmail('user1@gmail.com');
       expect(user.account).toBeDefined();
       expect(user.profile).toBeDefined();
@@ -55,8 +56,10 @@ describe('AuthService', () => {
 
     it('should return a token', async () => {
       expect(result).toBeDefined();
-      expect(typeof result).toBe('object');
-      expect(typeof result.token).toBe('string');
+      if(!hasServerError(result)) {
+        expect(typeof result).toBe('object');
+        expect(typeof result.token).toBe('string');
+      }
     });
 
     it('an account should be created', async () => {
@@ -105,8 +108,10 @@ describe('AuthService', () => {
         password: '1234',
       });
       expect(result).toBeDefined();
-      expect(typeof result).toBe('object');
-      expect(typeof result.token).toBe('string');
+      if(!hasServerError(result)) {
+        expect(typeof result).toBe('object');
+        expect(typeof result.token).toBe('string');
+      }
     });
 
     afterAll(async () => {
