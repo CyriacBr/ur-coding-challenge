@@ -48,6 +48,10 @@ export class ShopsService {
     await this.userService.update(userId, user);
   }
 
+  dislikeShop(userId: number, shopId: number) {
+    return this.shopDislikeService.add(userId, shopId);
+  }
+
   async findLikedShops(userId: number) {
     const user = await this.userService.findById(userId);
     return user.likedShops;
