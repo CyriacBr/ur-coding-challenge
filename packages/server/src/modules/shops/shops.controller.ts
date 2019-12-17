@@ -47,13 +47,13 @@ export class ShopsController {
     return this.service.create(data);
   }
 
-  @Post(':id')
+  @Post(':id/like')
   likeShop(@Req() req: Request, @Param('id') id: string) {
     const { userId } = req;
     return this.service.likeShop(userId, Number(id));
   }
 
-  @Post(':id')
+  @Post(':id/dislike')
   dislikeShop(@Req() req: Request, @Param('id') id: string) {
     const { userId } = req;
     return this.service.dislikeShop(userId, Number(id));
