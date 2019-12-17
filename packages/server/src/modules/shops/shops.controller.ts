@@ -7,11 +7,13 @@ import {
   Put,
   Patch,
   Delete,
-  UseGuards
+  UseGuards,
+  Req
 } from "@nestjs/common";
 import { ShopsService } from "./shops.service";
 import { Shop } from "./shops.entity";
 import { AuthGuard } from "../jwt/auth.guard";
+import { Request } from "src/utils/MyRequest";
 
 @UseGuards(AuthGuard)
 @Controller("shops")
@@ -21,6 +23,18 @@ export class ShopsController {
   @Get()
   findAll() {
     return this.service.findAll();
+  }
+
+  @Get('nearby')
+  findNearby(@Req() req: Request) {
+    const { userId } = req;
+    return this.service.findNearbyShops(userId);
+  }
+
+  @Get('liked')
+  findLiked(@Req() req: Request) {
+    const { userId } = req;
+    return this.service.findLikedShops(userId);
   }
 
   @Get(":id")
