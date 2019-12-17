@@ -166,4 +166,50 @@ describe('ShopsService', () => {
       await dislikeService.delete(dislike.id);
     });
   });
+
+  describe("'findLikedShops'", () => {
+    let user: User;
+    let shops: Shop[];
+    beforeAll(async () => {
+      const fixtures = await makeFixtures(
+        locationService,
+        userService,
+        service,
+      );
+      user = fixtures.user;
+      shops = fixtures.shops;
+    });
+
+    afterAll(async () => {
+      jest
+        .spyOn(userService, 'delete')
+        .mockImplementation(function(id: number) {
+          return this.repository.delete(id);
+        });
+      try {
+        await userService.delete(user.id);
+        for (const shop of shops) {
+          await service.delete(shop.id);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+
+    it('should work with a like', async () => {
+      let likedShops = await service.findLikedShops(user.id);
+      expect(likedShops.length).toBe(0);
+
+      await service.likeShop(user.id, shops[1].id);
+      likedShops = await service.findLikedShops(user.id);
+      expect(likedShops.length).toEqual(1);
+      expect(likedShops[0].id).toBe(shops[1].id);
+    });
+
+    it('should work with with a unlike', async () => {
+      await service.unlikeShop(user.id, shops[1].id);
+      let likedShops = await service.findLikedShops(user.id);
+      expect(likedShops.length).toBe(0);
+    });
+  });
 });

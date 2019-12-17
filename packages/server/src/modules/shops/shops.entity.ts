@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, JoinColumn, ManyToMany } from "typeorm";
 import { IShop } from "common";
 import { Location } from "../locations/locations.entity";
 import { User } from "../users/users.entity";
@@ -14,4 +14,7 @@ export class Shop implements IShop {
   @OneToOne(type => Location)
   @JoinColumn()
   location: Location;
+
+  @ManyToMany(type => User, user => user.likedShops)
+  likedFromUsers?: User[];
 }

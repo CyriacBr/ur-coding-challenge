@@ -45,7 +45,13 @@ export class ShopsService {
     const user = await this.userService.findById(userId);
     const shop = await this.findById(shopId);
     user.likedShops.push(shop);
-    await this.userService.update(userId, user);
+    await this.userService.save(user);
+  }
+
+  async unlikeShop(userId: number, shopId: number) {
+    const user = await this.userService.findById(userId);
+    user.likedShops = user.likedShops.filter(v => v.id !== shopId);
+    await this.userService.save(user);
   }
 
   dislikeShop(userId: number, shopId: number) {
