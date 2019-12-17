@@ -13,7 +13,7 @@ import {
 import { UserProfilesService } from "./user-profiles.service";
 import { UserProfile } from "./user-profiles.entity";
 import { AuthGuard } from "../jwt/auth.guard";
-import { Request } from "express";
+import { Request } from "src/utils/MyRequest";
 
 @UseGuards(AuthGuard)
 @Controller("user-profiles")
@@ -48,7 +48,6 @@ export class UserProfilesController {
 
   @Patch()
   updateFromUser(@Req() req: Request, @Body() data: UserProfile) {
-    //@ts-ignore
     const userId = req.userId as number;
     return this.service.updateFromUser(userId, data);
   }

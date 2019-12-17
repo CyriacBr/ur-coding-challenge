@@ -12,8 +12,8 @@ import {
 } from "@nestjs/common";
 import { LocationsService } from "./locations.service";
 import { Location } from "./locations.entity";
-import { Request } from "express";
 import { AuthGuard } from "../jwt/auth.guard";
+import { Request } from "src/utils/MyRequest";
 
 @UseGuards(AuthGuard)
 @Controller("locations")
@@ -48,7 +48,6 @@ export class LocationsController {
 
   @Patch()
   updateFromUser(@Req() req: Request, @Body() data: Location) {
-    //@ts-ignore
     const userId = req.userId as number;
     console.log('userId :', userId);
     return this.service.updateFromUser(userId, data);
