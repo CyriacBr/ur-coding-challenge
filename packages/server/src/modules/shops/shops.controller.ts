@@ -47,6 +47,18 @@ export class ShopsController {
     return this.service.create(data);
   }
 
+  @Post(':id')
+  likeShop(@Req() req: Request, @Param('id') id: string) {
+    const { userId } = req;
+    return this.service.likeShop(userId, Number(id));
+  }
+
+  @Post(':id')
+  dislikeShop(@Req() req: Request, @Param('id') id: string) {
+    const { userId } = req;
+    return this.service.dislikeShop(userId, Number(id));
+  }
+
   @Post("bulk")
   createBulk(@Body() data: Array<Shop>) {
     return this.service.createBulk(data);
