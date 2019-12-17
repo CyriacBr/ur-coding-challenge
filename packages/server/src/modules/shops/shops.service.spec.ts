@@ -47,16 +47,19 @@ async function makeFixtures(
       id: undefined,
       name: 'Shop A',
       location: locationA,
+      likedFromUsers: []
     },
     {
       id: undefined,
       name: 'Shop B',
       location: locationB,
+      likedFromUsers: []
     },
     {
       id: undefined,
       name: 'Shop C',
       location: locationC,
+      likedFromUsers: []
     },
   ]);
   const orderedShops = shops.sort((a, b) => {
@@ -200,10 +203,15 @@ describe('ShopsService', () => {
       let likedShops = await service.findLikedShops(user.id);
       expect(likedShops.length).toBe(0);
 
-      await service.likeShop(user.id, shops[1].id);
+      let shop = shops[1];
+      await service.likeShop(user.id, shop.id);
       likedShops = await service.findLikedShops(user.id);
       expect(likedShops.length).toEqual(1);
-      expect(likedShops[0].id).toBe(shops[1].id);
+      expect(likedShops[0].id).toBe(shop.id);
+
+      shop = await service.findById(shop.id);
+      expect(shop.likedFromUsers.length).toBe(1);
+      expect(shop.likedFromUsers[0].id).toBe(user.id);
     });
 
     it('should work with with a unlike', async () => {

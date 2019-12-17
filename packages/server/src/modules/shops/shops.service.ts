@@ -65,13 +65,13 @@ export class ShopsService {
 
   findAll() {
     return this.repository.find({
-      relations: ['location'],
+      relations: ['location', 'likedFromUsers'],
     });
   }
 
   findById(id: number) {
     return this.repository.findOne(id, {
-      relations: ['location'],
+      relations: ['location', 'likedFromUsers'],
     });
   }
 
