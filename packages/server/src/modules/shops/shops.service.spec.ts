@@ -10,6 +10,73 @@ import { UsersService } from '../users/users.service';
 import { LocationsService } from '../locations/locations.service';
 import { Location } from '../locations/locations.entity';
 
+async function makeFixtures(
+  locationService: LocationsService,
+  userService: UsersService,
+  service: ShopsService,
+) {
+  let location = await locationService.create({
+    id: undefined,
+    latitude: 500,
+    longitude: 500,
+  });
+  const user = await userService.create({
+    id: undefined,
+    account: null,
+    likedShops: [],
+    location,
+    profile: null,
+  });
+  let locationA = await locationService.create({
+    id: undefined,
+    latitude: 100,
+    longitude: 200,
+  });
+  let locationB = await locationService.create({
+    id: undefined,
+    latitude: 500,
+    longitude: 2000,
+  });
+  let locationC = await locationService.create({
+    id: undefined,
+    latitude: 8000,
+    longitude: 500,
+  });
+  const shops = await service.createBulk([
+    {
+      id: undefined,
+      name: 'Shop A',
+      location: locationA,
+    },
+    {
+      id: undefined,
+      name: 'Shop B',
+      location: locationB,
+    },
+    {
+      id: undefined,
+      name: 'Shop C',
+      location: locationC,
+    },
+  ]);
+  const orderedShops = shops.sort((a, b) => {
+    const aDistance = locationDistance(
+      user.location.latitude,
+      user.location.longitude,
+      a.location.latitude,
+      a.location.longitude,
+    );
+    const bDistance = locationDistance(
+      user.location.latitude,
+      user.location.longitude,
+      b.location.latitude,
+      b.location.longitude,
+    );
+    return aDistance - bDistance;
+  });
+  return { user, shops, orderedShops };
+}
+
 describe('ShopsService', () => {
   let service: ShopsService;
   let dislikeService: ShopDislikesService;
@@ -35,73 +102,23 @@ describe('ShopsService', () => {
     let user: User;
     let shops: Shop[];
     let orderedShops: Shop[];
-
     beforeAll(async () => {
-      let location = await locationService.create({
-        id: undefined,
-        latitude: 500,
-        longitude: 500
-      });
-      user = await userService.create({
-        id: undefined,
-        account: null,
-        likedShops: [],
-        location,
-        profile: null,
-      });
-      let locationA = await locationService.create({
-        id: undefined,
-        latitude: 100,
-        longitude: 200
-      });
-      let locationB = await locationService.create({
-        id: undefined,
-        latitude: 500,
-        longitude: 2000
-      });
-      let locationC = await locationService.create({
-        id: undefined,
-        latitude: 8000,
-        longitude: 500
-      });
-      shops = await service.createBulk([
-        {
-          id: undefined,
-          name: 'Shop A',
-          location: locationA,
-        },
-        {
-          id: undefined,
-          name: 'Shop B',
-          location: locationB,
-        },
-        {
-          id: undefined,
-          name: 'Shop C',
-          location: locationC,
-        },
-      ]);
-      orderedShops = shops.sort((a, b) => {
-        const aDistance = locationDistance(
-          user.location.latitude,
-          user.location.longitude,
-          a.location.latitude,
-          a.location.longitude,
-        );
-        const bDistance = locationDistance(
-          user.location.latitude,
-          user.location.longitude,
-          b.location.latitude,
-          b.location.longitude,
-        );
-        return aDistance - bDistance;
-      });
+      const fixtures = await makeFixtures(
+        locationService,
+        userService,
+        service,
+      );
+      user = fixtures.user;
+      shops = fixtures.shops;
+      orderedShops = fixtures.orderedShops;
     });
 
     afterAll(async () => {
-      jest.spyOn(userService, 'delete').mockImplementation(function(id: number) {
-        return this.repository.delete(id);
-      });
+      jest
+        .spyOn(userService, 'delete')
+        .mockImplementation(function(id: number) {
+          return this.repository.delete(id);
+        });
       try {
         await userService.delete(user.id);
         for (const shop of shops) {
@@ -122,7 +139,9 @@ describe('ShopsService', () => {
 
       await dislikeService.add(user.id, shopDislikeId);
       let expectedShops = await service.findNearbyShops(user.id);
-      expect(expectedShops).toEqual(orderedShops.filter(v => v.id !== shopDislikeId));
+      expect(expectedShops).toEqual(
+        orderedShops.filter(v => v.id !== shopDislikeId),
+      );
 
       await dislikeService.remove(user.id, shopDislikeId);
       expectedShops = await service.findNearbyShops(user.id);
@@ -145,7 +164,6 @@ describe('ShopsService', () => {
       expect(expectedShops).toEqual(orderedShops);
 
       await dislikeService.delete(dislike.id);
-      console.log('--Dislike removed');
     });
   });
 });
