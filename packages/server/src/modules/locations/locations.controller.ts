@@ -48,8 +48,7 @@ export class LocationsController {
 
   @Patch()
   updateFromUser(@Req() req: Request, @Body() data: Location) {
-    const userId = req.userId as number;
-    console.log('userId :', userId);
+    const { userId } = req;
     return this.service.updateFromUser(userId, data);
   }
 
