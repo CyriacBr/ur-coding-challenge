@@ -9,7 +9,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'ur_code_challenge_cyriac',
+      database:
+        process.env.NODE_ENV === 'production'
+          ? 'ur_code_challenge_cyriac'
+          : 'ur_code_challenge_cyriac_dev',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       keepConnectionAlive: true,
