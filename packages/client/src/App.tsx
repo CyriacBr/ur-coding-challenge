@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { AppBar } from "./shared/components/appBar";
 import { StoreProvider } from "easy-peasy";
-import { store } from "./store";
-import { Switch, BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { store, useStoreActions } from "./store";
+import {
+  Switch,
+  BrowserRouter as Router,
+  Route,
+  Redirect
+} from "react-router-dom";
 import { PrivateRoute } from "./shared/components/privateRoute";
 import { LoginPage } from "./pages/login/loginPage";
-import { NearbyShopsPage } from "./pages/nearby-shops/nearbyShopsPage";
+import { NearbyShopsPage } from "./pages/shops/shopsPage";
 import { PreferredShopsPage } from "./pages/preferred-shops/preferredShopsPage";
 import { RegisterPage } from "./pages/register/registerPage";
+import { useFetcher, Fetcher } from "react-fetcher-hooks";
 
 const s = {
   Container: styled.div`
     width: 100vw;
+    height: 100%;
     display: flex;
     flex-direction: column;
   `,
@@ -25,27 +32,38 @@ const s = {
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
+  const actions = useStoreActions(actions => actions.auth);
+  const fetcher = useFetcher();
+  actions.setFetcher(fetcher);
+
+  useEffect(() => {
+    actions.loadAuthState();
+  }, []);
   return (
-    <StoreProvider store={store}>
-      <s.Container>
-        <AppBar />
-        <s.Page>
-          <Router>
+    <s.Container>
+      <Fetcher
+        refs={fetcher}
+        Fallback={() => <div></div>}
+        options={{ initialLoading: true }}
+      >
+        <Router>
+          <AppBar />
+          <s.Page>
             <Switch>
               <Route exact path="/login" component={LoginPage} />
               <Route exact path="/register" component={RegisterPage} />
-              <PrivateRoute exact path="/nearby" component={NearbyShopsPage} />
+              <PrivateRoute exact path="/shops" component={NearbyShopsPage} />
               <PrivateRoute
                 exact
                 path="/preferred"
                 component={PreferredShopsPage}
               />
-              <Redirect to="/nearby" />
+              <Redirect to="/shops" />
             </Switch>
-          </Router>
-        </s.Page>
-      </s.Container>
-    </StoreProvider>
+          </s.Page>
+        </Router>
+      </Fetcher>
+    </s.Container>
   );
 };
 

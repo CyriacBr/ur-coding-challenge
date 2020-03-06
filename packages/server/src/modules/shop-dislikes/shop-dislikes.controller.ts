@@ -6,11 +6,14 @@ import {
   Post,
   Put,
   Patch,
-  Delete
+  Delete,
+  UseGuards
 } from "@nestjs/common";
 import { ShopDislikesService } from "./shop-dislikes.service";
 import { ShopDislike } from "./shop-dislikes.entity";
+import { AuthGuard } from "../jwt/auth.guard";
 
+@UseGuards(AuthGuard)
 @Controller("shop-dislikes")
 export class ShopDislikesController {
   constructor(private readonly service: ShopDislikesService) {}

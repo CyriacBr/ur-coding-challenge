@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "postinstall": "rm -rf ../../node_modules/@types/react-native"
   },
   "dependencies": {
     "@nestjs/common": "^6.7.2",
@@ -49,7 +50,7 @@
     "ts-node": "^8.4.1",
     "tsconfig-paths": "^3.9.0",
     "tslint": "^5.20.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.0"
   },
   "jest": {
     "moduleDirectories": [

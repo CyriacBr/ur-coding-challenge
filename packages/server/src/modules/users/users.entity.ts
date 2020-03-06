@@ -22,7 +22,7 @@ export class User implements IUser {
   @JoinColumn()
   location: Location;
 
-  @ManyToMany(type => Shop)
+  @ManyToMany(type => Shop, shop => shop.likedFromUsers)
   @JoinTable()
   likedShops: Shop[];
 }

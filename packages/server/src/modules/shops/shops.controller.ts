@@ -6,11 +6,16 @@ import {
   Post,
   Put,
   Patch,
-  Delete
+  Delete,
+  UseGuards,
+  Req
 } from "@nestjs/common";
 import { ShopsService } from "./shops.service";
 import { Shop } from "./shops.entity";
+import { AuthGuard } from "../jwt/auth.guard";
+import { Request } from "src/utils/MyRequest";
 
+@UseGuards(AuthGuard)
 @Controller("shops")
 export class ShopsController {
   constructor(private readonly service: ShopsService) {}
@@ -18,6 +23,18 @@ export class ShopsController {
   @Get()
   findAll() {
     return this.service.findAll();
+  }
+
+  @Get('nearby')
+  findNearby(@Req() req: Request) {
+    const { userId } = req;
+    return this.service.findNearbyShops(userId);
+  }
+
+  @Get('liked')
+  findLiked(@Req() req: Request) {
+    const { userId } = req;
+    return this.service.findLikedShops(userId);
   }
 
   @Get(":id")
@@ -28,6 +45,24 @@ export class ShopsController {
   @Post()
   create(@Body() data: Shop) {
     return this.service.create(data);
+  }
+
+  @Post(':id/like')
+  likeShop(@Req() req: Request, @Param('id') id: string) {
+    const { userId } = req;
+    return this.service.likeShop(userId, Number(id));
+  }
+
+  @Post(':id/unlike')
+  unlikeShop(@Req() req: Request, @Param('id') id: string) {
+    const { userId } = req;
+    return this.service.unlikeShop(userId, Number(id));
+  }
+
+  @Post(':id/dislike')
+  dislikeShop(@Req() req: Request, @Param('id') id: string) {
+    const { userId } = req;
+    return this.service.dislikeShop(userId, Number(id));
   }
 
   @Post("bulk")

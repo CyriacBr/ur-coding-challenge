@@ -63,6 +63,10 @@ export class UsersService {
     return this.repository.update(id, data);
   }
 
+  save(data: User) {
+    return this.repository.save(data);
+  }
+
   updateBulk(data: User[]) {
     const tasks: Array<Promise<UpdateResult>> = [];
     for (const item of data) {

@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
     const userId = this.extractUser(str);
     if (!userId) return false;
     //@ts-ignore
-    request.userId = data.userId;
+    request.userId = userId;
     return true;
   }
 

@@ -45,7 +45,21 @@ export class ShopsService {
     const user = await this.userService.findById(userId);
     const shop = await this.findById(shopId);
     user.likedShops.push(shop);
-    await this.userService.update(userId, user);
+    await this.userService.save(user);
+    //- return fresh shop with updated relations
+    return await this.findById(shopId);
+  }
+
+  async unlikeShop(userId: number, shopId: number) {
+    const user = await this.userService.findById(userId);
+    user.likedShops = user.likedShops.filter(v => v.id !== shopId);
+    await this.userService.save(user);
+    //- return fresh shop with updated relations
+    return await this.findById(shopId);
+  }
+
+  dislikeShop(userId: number, shopId: number) {
+    return this.shopDislikeService.add(userId, shopId);
   }
 
   async findLikedShops(userId: number) {
@@ -55,13 +69,13 @@ export class ShopsService {
 
   findAll() {
     return this.repository.find({
-      relations: ['location'],
+      relations: ['location', 'likedFromUsers'],
     });
   }
 
   findById(id: number) {
     return this.repository.findOne(id, {
-      relations: ['location'],
+      relations: ['location', 'likedFromUsers'],
     });
   }
 

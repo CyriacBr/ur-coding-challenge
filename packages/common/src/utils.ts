@@ -28,6 +28,6 @@ export function locationDistance(
     if (unit == "N") {
       dist = dist * 0.8684;
     }
-    return dist;
+    return Math.round(dist);
   }
 }

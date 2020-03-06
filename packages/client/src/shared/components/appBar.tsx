@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Dropdown, Avatar, Icon, Button } from "rsuite";
-import { useStoreState } from "../../store";
+import { Dropdown, Avatar, Icon, Button, Modal } from "rsuite";
+import { useStoreState, useStoreActions } from "../../store";
+import { Link } from "react-router-dom";
+import { LocationInput, PlaceSuggestion } from "./locationInput";
+import { UserAvatar } from "./userAvatar";
 
 const s = {
   Container: styled.div`
@@ -27,49 +30,19 @@ interface AppBarProps {}
 
 const AppBar: React.FC<AppBarProps> = () => {
   const isLoggedIn = useStoreState(state => state.auth.loggedIn);
-  const user = useStoreState(state => state.auth.userData);
-
-  const renderBloc = () => {
-    return isLoggedIn ? (
-      renderAvatar()
-    ) : (
-      <Button appearance="primary">Register</Button>
-    );
-  };
-
-  const renderAvatar = () => {
-    const { profile } = user;
-    const initials = `${profile.firstName[0]} ${profile.lastName[0]}`;
-    const fullName = `${profile.firstName} ${profile.lastName}`;
-    return (
-      <Dropdown
-        renderTitle={() => {
-          return <Avatar circle>{initials}</Avatar>;
-        }}
-      >
-        <Dropdown.Item panel style={{ padding: 10, width: 160 }}>
-          <p>Signed in as</p>
-          <strong>{fullName}</strong>
-        </Dropdown.Item>
-        <Dropdown.Item divider />
-        <Dropdown.Item>
-          <Icon icon="language" /> Change language
-        </Dropdown.Item>
-        <Dropdown.Item>
-          <Icon icon="location-arrow" /> Change location
-        </Dropdown.Item>
-        <Dropdown.Item divider />
-        <Dropdown.Item>
-          <Icon icon="sign-out" /> Déconnexion
-        </Dropdown.Item>
-      </Dropdown>
-    );
-  };
 
   return (
     <s.Container>
       <s.Title>ShopList</s.Title>
-      <s.Bloc>{renderBloc()}</s.Bloc>
+      <s.Bloc>
+        {isLoggedIn ? (
+          <UserAvatar />
+        ) : (
+          <Button appearance="primary">
+            <Link to="/register">Register</Link>
+          </Button>
+        )}
+      </s.Bloc>
     </s.Container>
   );
 };
